@@ -1,89 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seating Chart MVP</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: white;
-            color: black;
-        }
-        .seat {
-            width: 100px;
-            height: 100px;
-            border: 2px solid navy;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .kid {
-            background-color: lightgreen;
-        }
-        .adult {
-            background-color: lightcoral;
-        }
-        .selected {
-            border-color: green;
-            background-color: yellow;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Don Bosco Theatre Seating</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container mx-auto mt-10">
-        <h1 class="text-3xl mb-5 text-center">Seating Chart MVP</h1>
-        <div class="grid grid-cols-8 gap-4">
-            <!-- Generate 6 rows of seats -->
-            <!-- 50% kids seats and 50% adults seats -->
-            <script>
-                const seats = [];
-                const rows = 6;
-                const cols = 8;
-                const totalSeats = rows * cols;
-                const kidSeats = totalSeats / 2;
-                const adultSeats = totalSeats / 2;
 
-                // Create seats based on predefined data
-                for (let i = 0; i < totalSeats; i++) {
-                    let type = i < kidSeats ? 'kid' : 'adult';
-                    seats.push({
-                        id: i + 1,
-                        type: type,
-                        price: type === 'kid' ? 10 : 15,
-                        selected: false
-                    });
-                }
+<body class="bg-gray-900 text-white p-6">
 
-                seats.forEach(seat => {
-                    document.write(`<div class='seat ${seat.type}' data-id='${seat.id}' data-price='${seat.price}'>${seat.id}</div>`);
-                });
+  <h1 class="text-3xl font-bold mb-4">🎬 Don Bosco Theatre</h1>
 
-                // Seat selection logic
-                document.querySelectorAll('.seat').forEach(seat => {
-                    seat.addEventListener('click', function() {
-                        seat.classList.toggle('selected');
-                        seat.selected = !seat.selected;
-                        console.log(`Seat ${seat.dataset.id} selected: ${seat.selected}`);
-                    });
-                });
-            </script>
-        </div>
-        <div id="booking-summary" class="mt-5">
-            <h2 class="text-2xl">Booking Summary</h2>
-            <p id="total-price" class="mt-2"></p>
-            <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="calculateTotal()">Calculate Total</button>
-        </div>
-    </div>
-    <script>
-        function calculateTotal() {
-            let total = 0;
-            document.querySelectorAll('.selected').forEach(seat => {
-                total += parseFloat(seat.dataset.price);
-            });
-            document.getElementById('total-price').innerText = `Total Price: $${total}`;
-        }
-    </script>
+  <!-- Seating Chart -->
+  <div>
+    <h2 class="text-xl mb-2">Select Your Seats</h2>
+    <div id="seating" class="grid grid-cols-8 gap-2 mb-6"></div>
+  </div>
+
+  <!-- Ticket Type -->
+  <div class="mb-6">
+    <h2 class="text-xl mb-2">Tickets</h2>
+    <label>Adults ($5): </label>
+    <input type="number" id="adults" value="0" min="0" class="text-black w-16"><br>
+    <label>Kids ($3): </label>
+    <input type="number" id="kids" value="0" min="0" class="text-black w-16">
+  </div>
+
+  <!-- Snacks -->
+  <div class="mb-6">
+    <h2 class="text-xl mb-2">Snacks</h2>
+    <label><input type="checkbox" value="2" class="snack"> Popcorn ($2)</label><br>
+    <label><input type="checkbox" value="1.5" class="snack"> Soda ($1.5)</label><br>
+    <label><input type="checkbox" value="1" class="snack"> Candy ($1)</label>
+  </div>
+
+  <!-- Summary -->
+  <div class="bg-gray-800 p-4 rounded">
+    <h2 class="text-xl mb-2">Order Summary</h2>
+    <p id="summary"></p>
+    <p class="font-bold mt-2">Total: $<span id="total">0</span></p>
+  </div>
+
+<script>
+  const seatingDiv = document.getElementById("seating");
+  const summary = document.getElementById("summary");
+  const totalDisplay = document.getElementById("total");
+
+  let selectedSeats = [];
+
+  // Create seats (6x8)
+  for (let i = 1; i <= 48; i++) {
+    const seat = document.createElement("div");
+    seat.className = "bg-green-500 p-3 text-center cursor-pointer rounded";
+    seat.innerText = i;
+
+    seat.addEventListener("click", () => {
+      if (selectedSeats.includes(i)) {
+        selectedSeats = selectedSeats.filter(s => s !== i);
+        seat.classList.remove("bg-yellow-400");
+        seat.classList.add("bg-green-500");
+      } else {
+        selectedSeats.push(i);
+        seat.classList.remove("bg-green-500");
+        seat.classList.add("bg-yellow-400");
+      }
+
+      console.log("Selected seats:", selectedSeats);
+      updateSummary();
+    });
+
+    seatingDiv.appendChild(seat);
+  }
+
+  // Update summary
+  function updateSummary() {
+    const adults = parseInt(document.getElementById("adults").value) || 0;
+    const kids = parseInt(document.getElementById("kids").value) || 0;
+
+    let total = adults * 5 + kids * 3;
+
+    document.querySelectorAll(".snack:checked").forEach(snack => {
+      total += parseFloat(snack.value);
+    });
+
+    summary.innerText =
+      `Seats: ${selectedSeats.join(", ")} | Adults: ${adults} | Kids: ${kids}`;
+
+    totalDisplay.innerText = total.toFixed(2);
+  }
+
+  document.getElementById("adults").addEventListener("input", updateSummary);
+  document.getElementById("kids").addEventListener("input", updateSummary);
+  document.querySelectorAll(".snack").forEach(el =>
+    el.addEventListener("change", updateSummary)
+  );
+</script>
+
 </body>
 </html>
