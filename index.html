@@ -56,12 +56,12 @@
     seat.addEventListener("click", () => {
       if (selectedSeats.includes(i)) {
         selectedSeats = selectedSeats.filter(s => s !== i);
-        seat.classList.remove("bg-yellow-400");
-        seat.classList.add("bg-green-500");
+        seat.classList.remove("bg-pink-400");
+        seat.classList.add("bg-purple-500");
       } else {
         selectedSeats.push(i);
-        seat.classList.remove("bg-green-500");
-        seat.classList.add("bg-yellow-400");
+        seat.classList.remove("bg-pink-500");
+        seat.classList.add("bg-purple-400");
       }
 
       console.log("Selected seats:", selectedSeats);
